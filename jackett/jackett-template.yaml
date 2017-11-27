@@ -1,0 +1,196 @@
+apiVersion: v1
+kind: Template
+message: |-
+  The following service(s) have been created in your project: ${NAME}.
+
+  For more information about using this template, including OpenShift considerations, see https://github.com/jameseck/openshift-templates
+metadata:
+  annotations:
+    description: This template assumes you will have torrents and tv volumes already defined.
+    iconClass: fa fa-television
+    openshift.io/display-name: Jackett
+    openshift.io/documentation-url: https://github.com/jameseck/openshift-templates
+    openshift.io/long-description: This template defines resources needed to run Jackett.
+    openshift.io/provider-display-name: James Eckersall
+    openshift.io/support-url: https://github.com/jameseck/openshift-templates
+    tags: jackett
+    template.openshift.io/bindable: 'false'
+  name: jackett
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: ${NAME}
+    labels:
+      app: ${NAME}
+  spec:
+    dockerImageRepository: jameseckersall/jackett
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: jameseckersall/jackett:latest
+        importPolicy:
+          scheduled: true
+      name: latest
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 4
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${NAME}
+      deploymentconfig: ${NAME}
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ${NAME}
+          deploymentconfig: ${NAME}
+      spec:
+        containers:
+        - image: " "
+          imagePullPolicy: Always
+          readinessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: /
+              port: 9117
+            timeoutSeconds: 5
+          livenessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: /
+              port: 9117
+            timeoutSeconds: 5
+          name: ${NAME}
+          ports:
+          - containerPort: 9117
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /config
+            name: jackett-config
+          - mountPath: /torrents
+            name: torrents
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - persistentVolumeClaim:
+            claimName: torrents
+          name: torrents
+        - persistentVolumeClaim:
+            claimName: jackett-config
+          name: jackett-config
+    test: false
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - jackett
+        from:
+          kind: ImageStreamTag
+          name: jackett:latest
+- apiVersion: v1
+  kind: Route
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    tls:
+      termination: edge
+      insecureEdgeTerminationPolicy: Redirect
+    host: ${SITE_URL}
+    port:
+      targetPort: 9117-tcp
+    to:
+      kind: Service
+      name: ${NAME}
+      weight: 100
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+    creationTimestamp: null
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    ports:
+    - name: 9117-tcp
+      port: 9117
+      protocol: TCP
+      targetPort: 9117
+    selector:
+      app: ${NAME}
+      deploymentconfig: ${NAME}
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: jackett-config
+    labels:
+      app: ${NAME}
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+       requests:
+         storage: 1Gi
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: torrents
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+       requests:
+         storage: 1Gi
+    selector:
+      matchLabels:
+        typelabel: ${TORRENT_VOLUME_LABEL}
+parameters:
+- description: The name assigned to all of the frontend objects defined in this template.
+  name: NAME
+  displayName: Name
+  value: jackett
+  required: true
+- description: The URL for this application
+  name: SITE_URL
+  displayName: Site URL
+  value: ""
+- description: The match label of an existing PV where Torrents are stored
+  name: TORRENT_VOLUME_LABEL
+  displayName: Torrent Volume Label
+  value: torrents
+  required: true
+- description: The size of the config volume
+  name: CONFIG_VOLUME_SIZE
+  displayName: Config Volume Size
+  value: 1Gi
+  required: true
