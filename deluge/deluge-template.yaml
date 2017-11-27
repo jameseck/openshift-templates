@@ -239,7 +239,7 @@ objects:
     - ReadWriteMany
     resources:
        requests:
-         storage: 1Gi
+         storage: ${CONFIG_VOLUME_SIZE}
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
@@ -249,7 +249,7 @@ objects:
     - ReadWriteMany
     resources:
        requests:
-         storage: 1Gi
+         storage: ${TORRENT_VOLUME_SIZE}
     selector:
       matchLabels:
         typelabel: ${TORRENT_VOLUME_LABEL}
@@ -290,15 +290,15 @@ parameters:
   displayName: Torrent Volume Label
   value: torrents
   required: true
+- description: The size of the torrent volume
+  name: TORRENT_VOLUME_SIZE
+  displayName: Torrent Volume Size
+  value: 100Gi
+  required: true
 - description: The size of the config volume
   name: CONFIG_VOLUME_SIZE
   displayName: Config Volume Size
   value: 1Gi
-  required: true
-- description: Enable Privoxy
-  name: ENABLE_PRIVOXY
-  displayName: Enable Privoxy
-  value: "yes"
   required: true
 - description: The VPN Provider (default pia)
   name: VPN_PROV
