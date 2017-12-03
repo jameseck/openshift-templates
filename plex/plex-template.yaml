@@ -1,0 +1,268 @@
+apiVersion: v1
+kind: Template
+message: |-
+  The following service(s) have been created in your project: ${NAME}.
+
+  For more information about using this template, including OpenShift considerations, see https://github.com/jameseck/openshift-templates
+metadata:
+  annotations:
+    description: This template assumes you will have torrents and tv volumes already defined.
+    iconClass: fa fa-television
+    openshift.io/display-name: Sonarr
+    openshift.io/documentation-url: https://github.com/jameseck/openshift-templates
+    openshift.io/long-description: This template defines resources needed to run
+      Sonarr.
+    openshift.io/provider-display-name: James Eckersall
+    openshift.io/support-url: https://github.com/jameseck/openshift-templates
+    tags: plex
+    template.openshift.io/bindable: 'false'
+  name: plex
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    name: ${NAME}
+  spec:
+    dockerImageRepository: jameseckersall/plex
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: jameseckersall/plex:latest
+        importPolicy:
+          scheduled: true
+      name: latest
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    name: ${NAME}
+  spec:
+    recreateParams:
+      timeoutSeconds: 600
+    replicas: 1
+    selector:
+      deploymentconfig: ${NAME}
+    strategy:
+      resources: {}
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          deploymentconfig: ${NAME}
+      spec:
+        containers:
+        - image: " "
+          imagePullPolicy: Always
+          name: ${NAME}
+          ports:
+          - containerPort: 32414
+            protocol: UDP
+          - containerPort: 8324
+            protocol: TCP
+          - containerPort: 32413
+            protocol: UDP
+          - containerPort: 1900
+            protocol: UDP
+          - containerPort: 32400
+            protocol: TCP
+          - containerPort: 32469
+            protocol: TCP
+          - containerPort: 3005
+            protocol: TCP
+          - containerPort: 32410
+            protocol: UDP
+          - containerPort: 32412
+            protocol: UDP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /Library
+            name: plex-config
+          - mountPath: /media/films
+            name: films
+          - mountPath: /media/music
+            name: music
+          - mountPath: /media/tv
+            name: tv
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: plex-config
+          persistentVolumeClaim:
+            claimName: plex-config
+        - name: films
+          persistentVolumeClaim:
+            claimName: films
+        - name: music
+          persistentVolumeClaim:
+            claimName: music
+        - name: tv
+          persistentVolumeClaim:
+            claimName: tv
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${NAME}
+        from:
+          kind: ImageStreamTag
+          name: plex:latest
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: Route
+  metadata:
+    creationTimestamp: null
+    name: ${NAME}
+  spec:
+    host: ${SITE_URL}
+    port:
+      targetPort: 32400-tcp
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: ${NAME}
+      weight: 100
+    wildcardPolicy: None
+  status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    name: ${NAME}
+  spec:
+    ports:
+    - name: 1900-udp
+      port: 1900
+      protocol: UDP
+      targetPort: 1900
+    - name: 3005-tcp
+      port: 3005
+      protocol: TCP
+      targetPort: 3005
+    - name: 8324-tcp
+      port: 8324
+      protocol: TCP
+      targetPort: 8324
+    - name: 32400-tcp
+      port: 32400
+      protocol: TCP
+      targetPort: 32400
+    - name: 32410-udp
+      port: 32410
+      protocol: UDP
+      targetPort: 32410
+    - name: 32412-udp
+      port: 32412
+      protocol: UDP
+      targetPort: 32412
+    - name: 32413-udp
+      port: 32413
+      protocol: UDP
+      targetPort: 32413
+    - name: 32414-udp
+      port: 32414
+      protocol: UDP
+      targetPort: 32414
+    - name: 32469-tcp
+      port: 32469
+      protocol: TCP
+      targetPort: 32469
+    selector:
+      deploymentconfig: ${NAME}
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: null
+    name: plex-config
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${CONFIG_VOLUME_CAPACITY}
+  status: {}
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: films
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+       requests:
+         storage: 1Gi
+    selector:
+      matchLabels:
+        typelabel: ${FILMS_VOLUME_LABEL}
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: music
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+       requests:
+         storage: 1Gi
+    selector:
+      matchLabels:
+        typelabel: ${MUSIC_VOLUME_LABEL}
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: tv
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+       requests:
+         storage: 1Gi
+    selector:
+      matchLabels:
+        typelabel: ${TV_VOLUME_LABEL}
+parameters:
+- description: The name assigned to all of the frontend objects defined in this template.
+  name: NAME
+  displayName: Name
+  value: plex
+  required: true
+- description: The URL for this application
+  name: SITE_URL
+  displayName: Site URL
+  value: ""
+- description: The match label of an existing PV where Films are stored
+  name: FILMS_VOLUME_LABEL
+  displayName: Films Volume Label
+  value: films
+  required: true
+- description: The match label of an existing PV where Music is stored
+  name: MUSIC_VOLUME_LABEL
+  displayName: Music Volume Label
+  value: music
+  required: true
+- description: The match label of an existing PV where TV are stored
+  name: TV_VOLUME_LABEL
+  displayName: TV Volume Label
+  value: tv
+  required: true
+- description: Volume space available for config, e.g. 512Mi, 2Gi.
+  name: CONFIG_VOLUME_CAPACITY
+  displayName: Config Volume Capacity
+  required: true
+  value: 512Mi
