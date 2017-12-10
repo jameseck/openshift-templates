@@ -63,7 +63,10 @@ objects:
           deploymentconfig: ${NAME}
       spec:
         containers:
-        - image: " "
+        - env:
+          - name: API_KEY
+            value: ${API_KEY}
+          image: " "
           imagePullPolicy: Always
           readinessProbe:
             initialDelaySeconds: 10
@@ -215,3 +218,9 @@ parameters:
   displayName: Config Volume Size
   value: 1Gi
   required: true
+- description: API Key
+  name: API_KEY
+  displayName: API Key
+  required: true
+  generate: expression
+  from: "[a-f0-9]{32}"
