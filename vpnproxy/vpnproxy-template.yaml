@@ -65,7 +65,7 @@ objects:
         containers:
         - command: ["/bin/sh"]
           args:
-          - "mkdir /dev/net && mknod /dev/net/tun c 10 200 && runsvdir /app"
+          - mkdir /dev/net && mknod /dev/net/tun c 10 200 && runsvdir /app
           env:
           - name: USERNAME
             value: "${USERNAME}"
