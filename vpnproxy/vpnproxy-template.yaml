@@ -85,7 +85,10 @@ objects:
           terminationMessagePath: /dev/termination-log
         dnsPolicy: ClusterFirst
         restartPolicy: Always
-        securityContext: {}
+        securityContext:
+          privileged: true
+        serviceAccount: ${NAME}
+        serviceAccountName: ${NAME}
         terminationGracePeriodSeconds: 30
     test: false
     triggers:
