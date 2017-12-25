@@ -111,6 +111,8 @@ objects:
         serviceAccount: ${NAME}
         serviceAccountName: ${NAME}
         terminationGracePeriodSeconds: 30
+    securityContext:
+      privileged: true
     test: false
     triggers:
     - type: ConfigChange
