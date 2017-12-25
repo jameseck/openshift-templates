@@ -65,13 +65,13 @@ objects:
         containers:
         - env:
           - name: USERNAME
-            value: ${USERNAME}
+            value: "${USERNAME}"
           - name: PASSWORD
-            value: ${PASSWORD}
+            value: "${PASSWORD}"
           - name: REGION
-            value: ${REGION}
+            value: "${REGION}"
           - name: LOCAL_NETWORK
-            value: ${LOCAL_NETWORK}
+            value: "${LOCAL_NETWORK}"
           image: " "
           imagePullPolicy: Always
           readinessProbe:
@@ -124,7 +124,7 @@ objects:
       insecureEdgeTerminationPolicy: Redirect
     host: ${SITE_URL}
     port:
-      targetPort: 3128-tcp
+      targetPort: 8080-tcp
     to:
       kind: Service
       name: ${NAME}
@@ -144,10 +144,10 @@ objects:
     name: ${NAME}
   spec:
     ports:
-    - name: 3128-tcp
-      port: 3128
+    - name: 8080-tcp
+      port: 8080
       protocol: TCP
-      targetPort: 3128
+      targetPort: 8080
     selector:
       app: ${NAME}
       deploymentconfig: ${NAME}
