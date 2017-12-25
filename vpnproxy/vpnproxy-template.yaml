@@ -63,11 +63,7 @@ objects:
           deploymentconfig: ${NAME}
       spec:
         containers:
-        - command: ["/bin/sh"]
-          args:
-          - -c
-          - mknod /dev/net/tun c 10 200 && runsvdir /app
-          env:
+        - env:
           - name: USERNAME
             value: "${USERNAME}"
           - name: PASSWORD
@@ -76,6 +72,10 @@ objects:
             value: "${REGION}"
           - name: LOCAL_NETWORK
             value: "${LOCAL_NETWORK}"
+#        - command: ["/bin/sh"]
+#          args:
+#          - -c
+#          - mknod /dev/net/tun c 10 200 && runsvdir /app
           image: " "
           imagePullPolicy: Always
           readinessProbe:
