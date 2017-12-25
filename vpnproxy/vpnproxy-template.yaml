@@ -72,24 +72,20 @@ objects:
             value: "${REGION}"
           - name: LOCAL_NETWORK
             value: "${LOCAL_NETWORK}"
-#        - command: ["/bin/sh"]
-#          args:
-#          - -c
-#          - mknod /dev/net/tun c 10 200 && runsvdir /app
           image: " "
           imagePullPolicy: Always
-          readinessProbe:
-            initialDelaySeconds: 10
-            httpGet:
-              path: /
-              port: 8118
-            timeoutSeconds: 5
-          livenessProbe:
-            initialDelaySeconds: 10
-            httpGet:
-              path: /
-              port: 8118
-            timeoutSeconds: 5
+#          readinessProbe:
+#            initialDelaySeconds: 10
+#            httpGet:
+#              path: /
+#              port: 8118
+#            timeoutSeconds: 5
+#          livenessProbe:
+#            initialDelaySeconds: 10
+#            httpGet:
+#              path: /
+#              port: 8118
+#            timeoutSeconds: 5
           name: proxyvpn
           ports:
           - containerPort: 8118
