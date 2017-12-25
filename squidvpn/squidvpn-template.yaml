@@ -103,6 +103,8 @@ objects:
           imagePullPolicy: Always
           name: openvpn
           resources: {}
+          securityContext:
+            privileged: true
           terminationMessagePath: /dev/termination-log
         dnsPolicy: ClusterFirst
         restartPolicy: Always
