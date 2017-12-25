@@ -69,8 +69,8 @@ objects:
           - mknod
           - /dev/net/tun
           - c
-          - 10
-          - 200
+          - "10"
+          - "200"
           - "&&"
           - runsvdir
           - /app
