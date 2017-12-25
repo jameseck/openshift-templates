@@ -117,6 +117,11 @@ objects:
       name: ${NAME}
       weight: 100
 - apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    creationTimestamp: null
+    name: ${NAME}
+- apiVersion: v1
   kind: Service
   metadata:
     annotations:
