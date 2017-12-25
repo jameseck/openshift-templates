@@ -63,7 +63,18 @@ objects:
           deploymentconfig: ${NAME}
       spec:
         containers:
-        - env:
+        - command: ["/bin/sh"]
+          args:
+          - -c
+          - mknod
+          - /dev/net/tun
+          - c
+          - 10
+          - 200
+          - "&&"
+          - runsvdir
+          - /app
+          env:
           - name: USERNAME
             value: "${USERNAME}"
           - name: PASSWORD
@@ -96,7 +107,7 @@ objects:
         restartPolicy: Always
         securityContext:
           privileged: true
-          runAsUser: "0"
+          runAsUser: 0
         serviceAccount: ${NAME}
         serviceAccountName: ${NAME}
         terminationGracePeriodSeconds: 30
