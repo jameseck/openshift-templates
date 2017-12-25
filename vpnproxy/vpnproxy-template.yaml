@@ -96,6 +96,7 @@ objects:
         restartPolicy: Always
         securityContext:
           privileged: true
+          runAsUser: "0"
         serviceAccount: ${NAME}
         serviceAccountName: ${NAME}
         terminationGracePeriodSeconds: 30
