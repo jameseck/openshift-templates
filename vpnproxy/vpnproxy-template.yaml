@@ -96,6 +96,8 @@ objects:
             protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
+          securityContext:
+            privileged: true
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext:
@@ -104,8 +106,6 @@ objects:
         serviceAccount: ${NAME}
         serviceAccountName: ${NAME}
         terminationGracePeriodSeconds: 30
-    securityContext:
-      privileged: true
     test: false
     triggers:
     - type: ConfigChange
