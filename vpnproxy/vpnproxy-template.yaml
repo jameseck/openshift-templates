@@ -158,7 +158,7 @@ objects:
       app: ${NAME}
       deploymentconfig: ${NAME}
     sessionAffinity: None
-    type: ClusterIP
+    type: NodePort
   status:
     loadBalancer: {}
 parameters:
