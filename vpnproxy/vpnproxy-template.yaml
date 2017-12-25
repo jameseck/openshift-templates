@@ -82,17 +82,17 @@ objects:
             initialDelaySeconds: 10
             httpGet:
               path: /
-              port: 8080
+              port: 8118
             timeoutSeconds: 5
           livenessProbe:
             initialDelaySeconds: 10
             httpGet:
               path: /
-              port: 8080
+              port: 8118
             timeoutSeconds: 5
           name: proxyvpn
           ports:
-          - containerPort: 8080
+          - containerPort: 8118
             protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
@@ -130,7 +130,7 @@ objects:
       insecureEdgeTerminationPolicy: Redirect
     host: ${SITE_URL}
     port:
-      targetPort: 8080-tcp
+      targetPort: 8118-tcp
     to:
       kind: Service
       name: ${NAME}
@@ -150,10 +150,10 @@ objects:
     name: ${NAME}
   spec:
     ports:
-    - name: 8080-tcp
-      port: 8080
+    - name: 8118-tcp
+      port: 8118
       protocol: TCP
-      targetPort: 8080
+      targetPort: 8118
     selector:
       app: ${NAME}
       deploymentconfig: ${NAME}
