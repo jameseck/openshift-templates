@@ -99,7 +99,16 @@ objects:
             protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
-        - image: " "
+        - env:
+          - name: USERNAME
+            value: ${USERNAME}
+          - name: PASSWORD
+            value: ${PASSWORD}
+          - name: REGION
+            value: ${REGION}
+          - name: LOCAL_NETWORKS
+            value: ${LOCAL_NETWORKS}
+          image: " "
           imagePullPolicy: Always
           name: openvpn
           resources: {}
@@ -198,7 +207,7 @@ parameters:
   name: REGION
   displayName: PIA Region
   value: "UK London"
-- description: Local Network
-  name: LOCAL_NETWORK
-  displayName: Local Network
+- description: Comma separated list of local networks to not vpn
+  name: LOCAL_NETWORKS
+  displayName: Local Networks
   value: "172.30.0.0/16,192.168.1.0/24"
