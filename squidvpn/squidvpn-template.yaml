@@ -29,7 +29,7 @@ objects:
     - annotations: null
       from:
         kind: DockerImage
-        name: jameseckersall/squidvpn:latest
+        name: jameseckersall/squid:latest
         importPolicy:
           scheduled: true
       name: latest
@@ -40,12 +40,12 @@ objects:
     labels:
       app: ${NAME}
   spec:
-    dockerImageRepository: binhex/arch-openvpn
+    dockerImageRepository: jameseckersall/openvpn
     tags:
     - annotations: null
       from:
         kind: DockerImage
-        name: binhex/arch-openvpn:latest
+        name: jameseckersall/openvpn:latest
         importPolicy:
           scheduled: true
       name: latest
@@ -108,7 +108,10 @@ objects:
           terminationMessagePath: /dev/termination-log
         dnsPolicy: ClusterFirst
         restartPolicy: Always
-        securityContext: {}
+        securityContext:
+          privileged: true
+        serviceAccount: ${NAME}
+        serviceAccountName: ${NAME}
         terminationGracePeriodSeconds: 30
     test: false
     triggers:
@@ -168,6 +171,11 @@ objects:
     type: ClusterIP
   status:
     loadBalancer: {}
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    creationTimestamp: null
+    name: ${NAME}
 parameters:
 - description: The name assigned to all of the frontend objects defined in this template.
   name: NAME
@@ -178,3 +186,19 @@ parameters:
   name: SITE_URL
   displayName: Site URL
   value: ""
+- description: PIA Username
+  name: USERNAME
+  displayName: Username
+  value: ""
+- description: PIA Password
+  name: PASSWORD
+  displayName: Password
+  value: ""
+- description: PIA Region
+  name: REGION
+  displayName: PIA Region
+  value: "UK London"
+- description: Local Network
+  name: LOCAL_NETWORK
+  displayName: Local Network
+  value: "172.30.0.0/16,192.168.1.0/24"
