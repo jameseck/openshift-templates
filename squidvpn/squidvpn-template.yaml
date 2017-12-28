@@ -81,18 +81,18 @@ objects:
         containers:
         - image: " "
           imagePullPolicy: Always
-          readinessProbe:
-            initialDelaySeconds: 10
-            httpGet:
-              path: /
-              port: 3128
-            timeoutSeconds: 5
-          livenessProbe:
-            initialDelaySeconds: 10
-            httpGet:
-              path: /
-              port: 3128
-            timeoutSeconds: 5
+#          readinessProbe:
+#            initialDelaySeconds: 10
+#            httpGet:
+#              path: /
+#              port: 3128
+#            timeoutSeconds: 5
+#          livenessProbe:
+#            initialDelaySeconds: 10
+#            httpGet:
+#              path: /
+#              port: 3128
+#            timeoutSeconds: 5
           name: squid
           ports:
           - containerPort: 3128
