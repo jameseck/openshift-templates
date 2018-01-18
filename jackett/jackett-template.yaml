@@ -30,8 +30,8 @@ objects:
       from:
         kind: DockerImage
         name: jameseckersall/jackett:latest
-        importPolicy:
-          scheduled: true
+      importPolicy:
+        scheduled: true
       name: latest
 - apiVersion: v1
   kind: DeploymentConfig

@@ -6,17 +6,17 @@ message: |-
   For more information about using this template, including OpenShift considerations, see https://github.com/jameseck/openshift-templates
 metadata:
   annotations:
-    description: This template assumes you will have torrents and tv volumes already defined.
+    description: This template assumes you will have torrents and films volumes already defined.
     iconClass: fa fa-television
-    openshift.io/display-name: Sonarr
+    openshift.io/display-name: Radarr
     openshift.io/documentation-url: https://github.com/jameseck/openshift-templates
     openshift.io/long-description: This template defines resources needed to run
-      Sonarr.
+      Radarr.
     openshift.io/provider-display-name: James Eckersall
     openshift.io/support-url: https://github.com/jameseck/openshift-templates
-    tags: sonarr
+    tags: radarr
     template.openshift.io/bindable: 'false'
-  name: sonarr
+  name: radarr
 objects:
 - apiVersion: v1
   kind: ImageStream
@@ -24,12 +24,12 @@ objects:
     name: ${NAME}
     app: ${NAME}
   spec:
-    dockerImageRepository: jameseckersall/sonarr
+    dockerImageRepository: jameseckersall/radarr
     tags:
     - annotations: null
       from:
         kind: DockerImage
-        name: jameseckersall/sonarr:latest
+        name: jameseckersall/radarr:latest
       importPolicy:
         scheduled: true
       name: latest
@@ -72,27 +72,27 @@ objects:
             initialDelaySeconds: 10
             httpGet:
               path: /
-              port: 8989
+              port: 7878
             timeoutSeconds: 5
           livenessProbe:
             initialDelaySeconds: 10
             httpGet:
               path: /
-              port: 8989
+              port: 7878
             timeoutSeconds: 5
           name: ${NAME}
           ports:
-          - containerPort: 8989
+          - containerPort: 7878
             protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
           volumeMounts:
           - mountPath: /torrents
             name: torrents
-          - mountPath: /tv
-            name: tv
+          - mountPath: /films
+            name: films
           - mountPath: /config
-            name: sonarr-config
+            name: radarr-config
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
@@ -102,11 +102,11 @@ objects:
             claimName: torrents
           name: torrents
         - persistentVolumeClaim:
-            claimName: tv
-          name: tv
+            claimName: films
+          name: films
         - persistentVolumeClaim:
-            claimName: sonarr-config
-          name: sonarr-config
+            claimName: radarr-config
+          name: radarr-config
     test: false
     triggers:
     - type: ConfigChange
@@ -114,10 +114,10 @@ objects:
       imageChangeParams:
         automatic: true
         containerNames:
-        - sonarr
+        - radarr
         from:
           kind: ImageStreamTag
-          name: sonarr:latest
+          name: radarr:latest
 - apiVersion: v1
   kind: Route
   metadata:
@@ -131,7 +131,7 @@ objects:
       insecureEdgeTerminationPolicy: Redirect
     host: ${SITE_URL}
     port:
-      targetPort: 8989-tcp
+      targetPort: 7878-tcp
     to:
       kind: Service
       name: ${NAME}
@@ -146,10 +146,10 @@ objects:
     name: ${NAME}
   spec:
     ports:
-    - name: 8989-tcp
-      port: 8989
+    - name: 7878-tcp
+      port: 7878
       protocol: TCP
-      targetPort: 8989
+      targetPort: 7878
     selector:
       app: ${NAME}
       deploymentconfig: ${NAME}
@@ -173,7 +173,7 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: tv
+    name: films
   spec:
     accessModes:
     - ReadWriteMany
@@ -182,11 +182,11 @@ objects:
          storage: 1Gi
     selector:
       matchLabels:
-        typelabel: ${TV_VOLUME_LABEL}
+        typelabel: ${FILMS_VOLUME_LABEL}
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: sonarr-config
+    name: radarr-config
   spec:
     accessModes:
     - ReadWriteMany
@@ -197,7 +197,7 @@ parameters:
 - description: The name assigned to all of the frontend objects defined in this template.
   name: NAME
   displayName: Name
-  value: sonarr
+  value: radarr
   required: true
 - description: The URL for this application
   name: SITE_URL
@@ -209,9 +209,9 @@ parameters:
   value: torrents
   required: true
 - description: The match label of an existing PV where TV are stored
-  name: TV_VOLUME_LABEL
-  displayName: TV Volume Label
-  value: tv
+  name: FILMS_VOLUME_LABEL
+  displayName: Films Volume Label
+  value: films
   required: true
 - description: The size of the config volume
   name: CONFIG_VOLUME_SIZE

@@ -30,8 +30,8 @@ objects:
       from:
         kind: DockerImage
         name: jameseckersall/plex:latest
-        importPolicy:
-          scheduled: true
+      importPolicy:
+        scheduled: true
       name: latest
   status:
     dockerImageRepository: ""

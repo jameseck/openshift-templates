@@ -8,15 +8,15 @@ metadata:
   annotations:
     description: This template assumes you will have torrents and tv volumes already defined.
     iconClass: fa fa-television
-    openshift.io/display-name: Sonarr
+    openshift.io/display-name: Sabnzb
     openshift.io/documentation-url: https://github.com/jameseck/openshift-templates
     openshift.io/long-description: This template defines resources needed to run
-      Sonarr.
+      Sabnzb.
     openshift.io/provider-display-name: James Eckersall
     openshift.io/support-url: https://github.com/jameseck/openshift-templates
-    tags: sonarr
+    tags: sabnzb
     template.openshift.io/bindable: 'false'
-  name: sonarr
+  name: sabnzb
 objects:
 - apiVersion: v1
   kind: ImageStream
@@ -24,15 +24,17 @@ objects:
     name: ${NAME}
     app: ${NAME}
   spec:
-    dockerImageRepository: jameseckersall/sonarr
+    dockerImageRepository: jameseckersall/sabnzbd
     tags:
     - annotations: null
       from:
         kind: DockerImage
-        name: jameseckersall/sonarr:latest
+        name: jameseckersall/sabnzbd:latest
       importPolicy:
         scheduled: true
       name: latest
+      referencePolicy:
+        type: Source
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -92,7 +94,7 @@ objects:
           - mountPath: /tv
             name: tv
           - mountPath: /config
-            name: sonarr-config
+            name: sabnzb-config
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
@@ -105,8 +107,8 @@ objects:
             claimName: tv
           name: tv
         - persistentVolumeClaim:
-            claimName: sonarr-config
-          name: sonarr-config
+            claimName: sabnzb-config
+          name: sabnzb-config
     test: false
     triggers:
     - type: ConfigChange
@@ -114,10 +116,10 @@ objects:
       imageChangeParams:
         automatic: true
         containerNames:
-        - sonarr
+        - sabnzb
         from:
           kind: ImageStreamTag
-          name: sonarr:latest
+          name: ${NAME}:latest
 - apiVersion: v1
   kind: Route
   metadata:
@@ -186,7 +188,9 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: sonarr-config
+    name: sabnzb-config
+    labels:
+      app: ${NAME}
   spec:
     accessModes:
     - ReadWriteMany
@@ -197,7 +201,7 @@ parameters:
 - description: The name assigned to all of the frontend objects defined in this template.
   name: NAME
   displayName: Name
-  value: sonarr
+  value: sabnzb
   required: true
 - description: The URL for this application
   name: SITE_URL
