@@ -6,7 +6,7 @@ message: |-
   For more information about using this template, including OpenShift considerations, see https://github.com/jameseck/openshift-templates
 metadata:
   annotations:
-    description: This template assumes you will have torrents and tv volumes already defined.
+    description: This template assumes you will have downloads and tv volumes already defined.
     iconClass: fa fa-television
     openshift.io/display-name: Sabnzb
     openshift.io/documentation-url: https://github.com/jameseck/openshift-templates
@@ -74,23 +74,23 @@ objects:
             initialDelaySeconds: 10
             httpGet:
               path: /
-              port: 8989
+              port: 8080
             timeoutSeconds: 5
           livenessProbe:
             initialDelaySeconds: 10
             httpGet:
               path: /
-              port: 8989
+              port: 8080
             timeoutSeconds: 5
           name: ${NAME}
           ports:
-          - containerPort: 8989
+          - containerPort: 8080
             protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
           volumeMounts:
-          - mountPath: /torrents
-            name: torrents
+          - mountPath: /downloads
+            name: downloads
           - mountPath: /tv
             name: tv
           - mountPath: /config
@@ -101,8 +101,8 @@ objects:
         terminationGracePeriodSeconds: 30
         volumes:
         - persistentVolumeClaim:
-            claimName: torrents
-          name: torrents
+            claimName: downloads
+          name: downloads
         - persistentVolumeClaim:
             claimName: tv
           name: tv
@@ -133,7 +133,7 @@ objects:
       insecureEdgeTerminationPolicy: Redirect
     host: ${SITE_URL}
     port:
-      targetPort: 8989-tcp
+      targetPort: 8080-tcp
     to:
       kind: Service
       name: ${NAME}
@@ -148,10 +148,10 @@ objects:
     name: ${NAME}
   spec:
     ports:
-    - name: 8989-tcp
-      port: 8989
+    - name: 8080-tcp
+      port: 8080
       protocol: TCP
-      targetPort: 8989
+      targetPort: 8080
     selector:
       app: ${NAME}
       deploymentconfig: ${NAME}
@@ -162,7 +162,7 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: torrents
+    name: downloads
   spec:
     accessModes:
     - ReadWriteMany
@@ -171,7 +171,7 @@ objects:
          storage: 1Gi
     selector:
       matchLabels:
-        typelabel: ${TORRENT_VOLUME_LABEL}
+        typelabel: ${DOWNLOADS_VOLUME_LABEL}
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
@@ -208,9 +208,9 @@ parameters:
   displayName: Site URL
   value: ""
 - description: The match label of an existing PV where Torrents are stored
-  name: TORRENT_VOLUME_LABEL
-  displayName: Torrent Volume Label
-  value: torrents
+  name: DOWNLOADS_VOLUME_LABEL
+  displayName: Downloads Volume Label
+  value: downloads
   required: true
 - description: The match label of an existing PV where TV are stored
   name: TV_VOLUME_LABEL

@@ -6,7 +6,7 @@ message: |-
   For more information about using this template, including OpenShift considerations, see https://github.com/jameseck/openshift-templates
 metadata:
   annotations:
-    description: This template assumes you will have torrents and tv volumes already defined.
+    description: This template assumes you will have torrents, downloads and tv volumes already defined.
     iconClass: fa fa-television
     openshift.io/display-name: Sonarr
     openshift.io/documentation-url: https://github.com/jameseck/openshift-templates
@@ -87,6 +87,8 @@ objects:
           resources: {}
           terminationMessagePath: /dev/termination-log
           volumeMounts:
+          - mountPath: /downloads
+            name: downloads
           - mountPath: /torrents
             name: torrents
           - mountPath: /tv
@@ -104,6 +106,9 @@ objects:
         - persistentVolumeClaim:
             claimName: tv
           name: tv
+        - persistentVolumeClaim:
+            claimName: downloads
+          name: downloads
         - persistentVolumeClaim:
             claimName: sonarr-config
           name: sonarr-config
@@ -186,6 +191,19 @@ objects:
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
+    name: downloads
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+       requests:
+         storage: 1Gi
+    selector:
+      matchLabels:
+        typelabel: ${DOWNLOADS_VOLUME_LABEL}
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
     name: sonarr-config
   spec:
     accessModes:
@@ -212,6 +230,11 @@ parameters:
   name: TV_VOLUME_LABEL
   displayName: TV Volume Label
   value: tv
+  required: true
+- description: The match label of an existing PV where nzb downloads are stored (same path as Sabnzb)
+  name: DOWNLOADS_VOLUME_LABEL
+  displayName: Downloads Volume Label
+  value: downloads
   required: true
 - description: The size of the config volume
   name: CONFIG_VOLUME_SIZE
