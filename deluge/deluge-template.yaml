@@ -331,7 +331,7 @@ parameters:
 - description: VPN Protocol
   name: VPN_PROTOCOL
   displayName: VPN Protocol
-  value: udp
+  value: tcp
   required: true
 - description: LAN Network - This should probably match the Openshift cluster network
   name: LAN_NETWORK
