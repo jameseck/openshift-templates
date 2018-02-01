@@ -6,7 +6,9 @@ message: |-
   For more information about using this template, including OpenShift considerations, see https://github.com/jameseck/openshift-templates
 metadata:
   annotations:
-    description: Pydio
+    description: >
+      Pydio also needs a MySQL/MariaDB database.  Use one of the openshift built-in templates and fill in the details
+      during the Pydio web installer.
     iconClass: fa share-alt-square
     openshift.io/display-name: Pydio
     openshift.io/documentation-url: https://github.com/jameseck/openshift-templates
@@ -64,23 +66,7 @@ objects:
           deploymentconfig: ${NAME}
       spec:
         containers:
-        - env:
-          - name: MYSQL_USER
-            valueFrom:
-              secretKeyRef:
-                key: database-user
-                name: mariadb
-          - name: MYSQL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: database-password
-                name: mariadb
-          - name: MYSQL_DATABASE
-            valueFrom:
-              secretKeyRef:
-                key: database-name
-                name: mariadb
-          image: " "
+        - image: " "
           imagePullPolicy: Always
           readinessProbe:
             initialDelaySeconds: 10
