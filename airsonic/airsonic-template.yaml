@@ -64,7 +64,7 @@ objects:
           - name: AIRSONIC_PORT
             value: "4040"
           - name: JAVA_OPTS
-            value: -Dserver.use-forward-headers=true
+            value: "${JAVA_OPTS}"
           image: " "
           imagePullPolicy: Always
           livenessProbe:
@@ -173,8 +173,6 @@ objects:
     type: ClusterIP
   status:
     loadBalancer: {}
-kind: List
-metadata: {}
 parameters:
 - description: The name assigned to all of the frontend objects defined in this template.
   name: NAME
@@ -194,4 +192,9 @@ parameters:
   name: CONFIG_VOLUME_SIZE
   displayName: Config Volume Size
   value: 1Gi
+  required: true
+- description: Options to pass to Java
+  name: JAVA_OPTS
+  displayName: JAVA_OPTS
+  value: -Dserver.use-forward-headers=true
   required: true
