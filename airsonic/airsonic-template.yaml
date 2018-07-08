@@ -30,8 +30,21 @@ objects:
   spec:
     lookupPolicy:
       local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: airsonic/airsonic
+      from:
+        kind: DockerImage
+        name: airsonic/airsonic:latest
+      generation: 5
+      importPolicy:
+        scheduled: true
+      name: latest
+      referencePolicy:
+        type: Source
   status:
     dockerImageRepository: ""
+
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
