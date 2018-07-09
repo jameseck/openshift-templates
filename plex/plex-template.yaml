@@ -121,6 +121,8 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
+    annotate:
+      kubernetes.io/tls-acme: "true"
     creationTimestamp: null
     name: ${NAME}
   spec:

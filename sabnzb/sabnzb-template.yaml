@@ -123,6 +123,8 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
+    annotate:
+      kubernetes.io/tls-acme: "true"
     creationTimestamp: null
     labels:
       app: ${NAME}
